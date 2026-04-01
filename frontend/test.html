@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Page</title>
+  <style>
+    body {
+      background: #0a0a0a;
+      color: #ededed;
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 40px;
+    }
+    .test-box {
+      background: #171717;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+    button {
+      background: #dc2626;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background: #b91c1c;
+    }
+    #result {
+      margin-top: 20px;
+      padding: 20px;
+      background: #1a1a1a;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Movie Op - Test Page</h1>
+
+  <div class="test-box">
+    <h2>Backend Connection Test</h2>
+    <button onclick="testBackend()">Test Backend API</button>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    async function testBackend() {
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = '<p>Testing backend connection...</p>';
+
+      try {
+        const response = await fetch('http://localhost:5000/api/health');
+        const data = await response.json();
+        resultDiv.innerHTML = `
+          <h3>✅ Backend is working!</h3>
+          <pre>${JSON.stringify(data, null, 2)}</pre>
+        `;
+
+        // Now test movies endpoint
+        const moviesResponse = await fetch('http://localhost:5000/api/movies/popular');
+        const moviesData = await moviesResponse.json();
+        resultDiv.innerHTML += `
+          <h3>✅ Movies API is working!</h3>
+          <p>Found ${moviesData.data.results.length} movies</p>
+          <p>First movie: ${moviesData.data.results[0].title}</p>
+        `;
+      } catch (error) {
+        resultDiv.innerHTML = `
+          <h3>❌ Error!</h3>
+          <p>${error.message}</p>
+        `;
+      }
+    }
+
+    // Auto-test on load
+    window.addEventListener('load', testBackend);
+  </script>
+</body>
+</html>
